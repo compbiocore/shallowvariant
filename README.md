@@ -29,10 +29,17 @@ Also see: [more details on DeepVariant quick start](https://github.com/google/de
 
 We also have an initial implementation for the child model, which is a CNN layer and a dense layer in [src](./src), along with a script to run the model. There is also a skeleton for `get_data()`, although we are waiting to see how to use the `TFRecord` files as input.
 
+## 11/21/19
+
+ * The `TFRecord` objects outputted by `call_variants` are actually storing many ProtoBufs that can only be opened with DeepVariant-specific code which also relies on Nucleus, and DeepVariant has to be built for us to be able to extract the objects. Mary has written a Dockerfile that pulls DeepVariant and converts the ProtoBufs into a `tsv` file that is the actual probabilities. Validation: the number of probabilities matches the number of examples (82). We do not know if the order matches, but we hope so.
+ * The `TFRecord` examples which are the output of `make_examples` are just `TFExamples` which is a `ProtoBuf` with an undocumented dictionary on top. The dictionary lives in the `DeepVariant` code.
+ * The `DeepVariant` version we are going to stick to is .7.2, as there are significant changes in current versions that also change the `TFRecord` objects. This may prove a problem for maintainability as if we wanted to use more current versions we would have to invest re-engineering work.
+ * Right now, `preprocess` reads files for input, parses images, gets the images into the right shape, and outputs those as inputs for the model. Still need to work on labels. Also need to figure out split and shuffling.
+ * August is going to work on getting out the true labels, of which there should be 82. Mary is going to continue working on the model.
+
 # Next steps
 
- * Spin up a Docker image with Linux and install [Nucleus](https://github.com/google/nucleus) on it, then open the `TFRecord` files using the library to see what they look like. They should be probabilities.
- * Implement `get_data()` based off of the `TFRecord` files. We will have to split this data ourselves, but the ingestion of the files should be straightforward based off of DeepVariant.
+ * Continue working on `get_data()` based off of the `TFRecord` files. We will have to split this data ourselves, but the ingestion of the files should be straightforward based off of DeepVariant.
  * Implement getting the labels from the `TFRecord` files. This could possibly be in `get_data()`, or in a different function.
  * Run the child model to make sure it doesn't crash.
  * If we get the model working (and credits), run DeepVariant on GCP on a larger dataset to get initial input. This will take a couple hours, so we will want to monitor the run and shut off the instance after.
