@@ -32,7 +32,7 @@ def run(
         train_dataset = dataset.skip(split_n)
 
     else:
-        test_dataset, _ = get_data(input_path)
+        test_dataset, _ = get_data(input_path, probs_path)
 
     # import code
     # code.interact(local=dict(globals(), **locals()))
@@ -44,9 +44,9 @@ def run(
         m.train(model, train_dataset)
 
         if save:
-            tf.saved_model.save(model, save_path)
+            model.save(save_path)
     else:
-        model = tf.saved_model.load(load_path)
+        model = tf.keras.models.load_model(load_path)
 
     # Set up the testing steps
     loss, accuracy = m.test(model, test_dataset)
