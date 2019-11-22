@@ -6,12 +6,11 @@ import tensorflow as tf
 parser = argparse.ArgumentParser()
 parser.add_argument("--train", action="store_true")
 parser.add_argument("--cnnsize", "-c", default=100)
-parser.add_argument("--learningrate", "-l", default=0.01)
+parser.add_argument("--learningrate", "-r", default=0.01)
 parser.add_argument("--inputpath", "-i", required=True)
-parser.add_argument("--probspath", "-r", nargs="?")
-parser.add_argument("--save", "-s", action="store_true")
-parser.add_argument("--savepath", "-p")
-parser.add_argument("--loadpath", "-m")
+parser.add_argument("--probspath", "-p", nargs="?")
+parser.add_argument("--savepath", "-s", nargs="?")
+parser.add_argument("--loadpath", "-l", nargs="?")
 
 
 def run(
@@ -58,13 +57,8 @@ def run(
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    if args.train:
-        assert args.probspath !=""
-
-        if args.save:
-            assert args.savepath != ""
-    else:
-        assert args.loadpath != ""
+    if args.savepath != "":
+        save = True
 
     run(
         train=args.train,
@@ -72,7 +66,7 @@ if __name__ == "__main__":
         learning_rate=args.learningrate,
         input_path=args.inputpath,
         probs_path=args.probspath,
-        save=args.save,
+        save=save,
         save_path=args.savepath,
         load_path=args.loadpath,
     )
