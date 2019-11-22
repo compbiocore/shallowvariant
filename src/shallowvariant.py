@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--train", action="store_true")
 parser.add_argument("--cnnsize", "-c", default=100)
 parser.add_argument("--learningrate", "-l", default=0.01)
-parser.add_argument("--inputpath", "-i", nargs="?")
+parser.add_argument("--inputpath", "-i", required=True)
 parser.add_argument("--probspath", "-r", nargs="?")
 parser.add_argument("--save", "-s", action="store_true")
 parser.add_argument("--savepath", "-p")
@@ -49,17 +49,16 @@ def run(
         model = tf.saved_model.load(load_path)
 
     # Set up the testing steps
-    loss = m.test(model, test_dataset)
+    loss, accuracy = m.test(model, test_dataset)
 
     # Print out perplexity
-    print("Test Loss:", loss)
+    print("Test Accuracy:", accuracy)
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.train:
-        assert args.inputpath != ""
         assert args.probspath !=""
 
         if args.save:
