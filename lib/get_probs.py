@@ -10,6 +10,7 @@ python get_probs.py -i /input/data/labels/<infile> -o /input/data/labels/<outfil
 from deepvariant.protos import deepvariant_pb2
 from third_party.nucleus.util import io_utils
 import argparse
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--infile", "-i")
@@ -18,8 +19,8 @@ parser.add_argument("--outfile", "-o")
 def read_write_call_variant_output(infile, outfile):
     f = open(outfile, "w")
     for record in io_utils.read_tfrecords(infile, deepvariant_pb2.CallVariantsOutput):
-        probs = list(record.genotype_probabilities)
-        f.write("\t".join(map(str, probs)))
+        probs = list(np.around(record.genotype_probabilities, 8))
+        f.write("\t".join(map(lambda x: '%0.10f' % x, probs)))
         f.write("\n")
 
     f.close()
