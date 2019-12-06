@@ -3,6 +3,7 @@ import tensorflow as tf
 import os
 
 input_spec = {
+        'label': tf.io.FixedLenFeature((), tf.int64),
         'image/encoded': tf.io.FixedLenFeature((), tf.string),
         # 'image/format': tf.io.FixedLenFeature((), tf.string),
         # 'image/shape': tf.io.FixedLenFeature((), tf.int64),
@@ -13,6 +14,7 @@ input_spec = {
     }
 
 label_spec = {
+        'label': tf.io.FixedLenFeature((), tf.int64),
         'variant': tf.io.FixedLenFeature((), tf.string),
         'probabilities': tf.io.FixedLenFeature((), tf.string),
     }
@@ -20,17 +22,22 @@ label_spec = {
 def _parse_inputs_function(example_proto):
     # Parse the input tf.Example proto using the dictionary above.
     parsed = tf.io.parse_single_example(example_proto, input_spec)
+    print(parsed.values())
     image = parsed['image/encoded']
     # If the input is empty there won't be a tensor_shape.
     image = tf.reshape(tf.io.decode_raw(image, tf.uint8), [100, 221, 6])
     image = tf.dtypes.cast(image, tf.int32)
-
     return image
 
 def _parse_labels_function(example_proto):
     # Parse the input tf.Example proto using the dictionary above
     parsed = tf.io.parse_single_example(example_proto, label_spec)
-    return parsed
+    print(parsed.values())
+    label = parsed['label']
+    label = tf.io.decode_raw(label, tf.string)
+#    label = tf.dtypes.cast(label, tf.int32)
+    print("label: ", label)
+    return label
 
 def get_data(input_path, label_path):
     input_files = [os.path.join(input_path, x) for x in os.listdir(input_path)]
