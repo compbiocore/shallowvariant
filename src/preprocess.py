@@ -4,15 +4,12 @@ import numpy as np
 import os
 
 input_spec = {
-        'label': tf.io.FixedLenFeature((), tf.int64),
         'image/encoded': tf.io.FixedLenFeature((), tf.string),
-        # 'image/format': tf.io.FixedLenFeature((), tf.string),
-        # 'image/shape': tf.io.FixedLenFeature((), tf.int64),
-        'variant/encoded': tf.io.FixedLenFeature((), tf.string),
-        # 'alt_allele_indices/encoded': tf.io.FixedLenFeature((), tf.string),
-        # 'variant_type': tf.io.FixedLenFeature((), tf.int64),
-        # 'sequencing_type': tf.io.FixedLenFeature([], tf.int64),
     }
+
+label_spec = {
+    'label': tf.io.FixedLenFeature((), tf.int64)
+}
 
 def _parse_inputs_function(example_proto):
     # Parse the input tf.Example proto using the dictionary above.
@@ -26,10 +23,11 @@ def _parse_inputs_function(example_proto):
 
 def _parse_labels_function(example_proto):
     # Parse the input tf.Example proto using the dictionary above.
-    parsed = tf.io.parse_single_example(example_proto, input_spec)
+    parsed = tf.io.parse_single_example(example_proto, label_spec)
     val = parsed['label']
     # If the input is empty there won't be a tensor_shape.
     encoded = tf.one_hot([val], depth=3)
+    encoded = tf.reshape(encoded, [-1])
 
     return encoded
 

@@ -15,7 +15,7 @@ def make_model(cnn_size=100, kernel_size=3, learning_rate=0.01):
 
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                   loss=tf.keras.losses.CategoricalCrossentropy(),
-                  metrics=[tf.keras.metrics.CategoricalAccuracy()])
+                  metrics=[tf.keras.metrics.CategoricalAccuracy(), tf.keras.metrics.Precision(), tf.keras.metrics.Recall()])
 
     return model
 

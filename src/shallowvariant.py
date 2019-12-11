@@ -51,10 +51,12 @@ def run(
 
     # Set up the testing steps
     if not train:
-        loss, accuracy = m.test(model, dataset)
+        loss, accuracy, precision, recall = m.test(model, dataset)
 
-        # Print out perplexity
+        # Print out results
         print("Test Accuracy:", accuracy)
+        print("Test Precision:", precision)
+        print("Test Recall:", recall)
 
 
 if __name__ == "__main__":
