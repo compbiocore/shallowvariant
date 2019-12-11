@@ -4,6 +4,7 @@ import numpy as np
 import os
 
 input_spec = {
+        'label': tf.io.FixedLenFeature((), tf.int64),
         'image/encoded': tf.io.FixedLenFeature((), tf.string),
         # 'image/format': tf.io.FixedLenFeature((), tf.string),
         # 'image/shape': tf.io.FixedLenFeature((), tf.int64),
@@ -23,7 +24,16 @@ def _parse_inputs_function(example_proto):
 
     return image
 
-def get_data(input_path, probs_path):
+def _parse_labels_function(example_proto):
+    # Parse the input tf.Example proto using the dictionary above.
+    parsed = tf.io.parse_single_example(example_proto, input_spec)
+    val = parsed['label']
+    # If the input is empty there won't be a tensor_shape.
+    encoded = tf.one_hot([val], depth=3)
+
+    return encoded
+
+def get_data_train(input_path, probs_path):
     # get pile-up images
     input_files = [os.path.join(input_path, x) for x in os.listdir(input_path)]
     inputs = tf.data.TFRecordDataset(input_files, compression_type="GZIP")
@@ -39,11 +49,23 @@ def get_data(input_path, probs_path):
     p = np.array(probs)
     p = np.reshape(p, [-1, 3])
 
-    n = p.shape[0]
+    # n = p.shape[0]
 
     p = tf.data.Dataset.from_tensor_slices(p)
 
-    return tf.data.Dataset.zip((parsed_inputs, p)), n
+    return tf.data.Dataset.zip((parsed_inputs, p))
+
+def get_data_eval(input_path, label_path):
+    # get pile-up images
+    input_files = [os.path.join(input_path, x) for x in os.listdir(input_path)]
+    inputs = tf.data.TFRecordDataset(input_files, compression_type="GZIP")
+    parsed_inputs = inputs.map(_parse_inputs_function)
+
+    label_files = [os.path.join(input_path, x) for x in os.listdir(label_path)]
+    labels = tf.data.TFRecordDataset(label_files, compression_type="GZIP")
+    parsed_labels = labels.map(_parse_labels_function)
+
+    return tf.data.Dataset.zip((parsed_inputs, parsed_labels))
 
 
 # Example of getting data and using it

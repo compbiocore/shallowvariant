@@ -24,8 +24,7 @@ def train(model, dataset):
     Runs through one epoch - all training examples.
 
     :param model: the initilized model to use for forward and backward pass
-    :param train_inputs: train inputs (all inputs for training) of shape (num_inputs,TBD, TBD)
-    :param train_labels: train labels (all labels for training) of shape (num_labels,3)
+    :param dataset: tf dataset with zipped training images and label probabilities
     :return: None
     """
 
@@ -40,9 +39,7 @@ def test(model, dataset):
 
     :param model: the trained model to use for prediction
     :param dataset: test data (all inputs for testing) of shape (num_inputs,)
-    :returns: loss of the test set
-
-    Note: perplexity is exp(total_loss/number of predictions)
+    :returns: accuracy of the test set
     """
 
     batched = dataset.batch(10)
