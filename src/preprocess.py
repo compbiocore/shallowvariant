@@ -59,7 +59,7 @@ def get_data_eval(input_path, label_path):
     inputs = tf.data.TFRecordDataset(input_files, compression_type="GZIP")
     parsed_inputs = inputs.map(_parse_inputs_function)
 
-    label_files = [os.path.join(input_path, x) for x in os.listdir(label_path)]
+    label_files = [os.path.join(label_path, x) for x in os.listdir(label_path)]
     labels = tf.data.TFRecordDataset(label_files, compression_type="GZIP")
     parsed_labels = labels.map(_parse_labels_function)
 
@@ -67,7 +67,7 @@ def get_data_eval(input_path, label_path):
 
 
 # Example of getting data and using it
-# https://github.com/google/deepvariant/blob/r0.9/docs/visualizing_examples.ipynb
+#
 #
 # Currently three things in the spec from the latest deep variant code are commented out, because they weren't in the test run data
 #

@@ -5,8 +5,8 @@ import tensorflow as tf
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--train", action="store_true")
-parser.add_argument("--cnnsize", "-c", default=100)
-parser.add_argument("--learningrate", "-r", default=0.01)
+parser.add_argument("--cnnsize", "-c", default=100, type=int)
+parser.add_argument("--learningrate", "-r", default=0.01, type=float)
 parser.add_argument("--inputpath", "-i", required=True)
 parser.add_argument("--probspath", "-p", nargs="?")
 parser.add_argument("--labelpath", "-l", nargs="?")
@@ -28,12 +28,14 @@ def run(
 
     if train:
         dataset = get_data_train(input_path, probs_path)
+        dataset = dataset.take(846700)
         # split_n = size // 10
         # test_dataset = dataset.take(split_n)
         # train_dataset = dataset.skip(split_n)
 
     else:
         dataset = get_data_eval(input_path, label_path)
+        dataset = dataset.take(100000)
 
     # import code
     # code.interact(local=dict(globals(), **locals()))

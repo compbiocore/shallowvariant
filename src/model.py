@@ -28,9 +28,9 @@ def train(model, dataset):
     :return: None
     """
 
-    shuffled = dataset.shuffle(buffer_size=100).batch(10)
+    shuffled = dataset.shuffle(buffer_size=100).batch(100)
 
-    model.fit(shuffled, epochs=10)
+    model.fit(shuffled, epochs=1)
 
 
 def test(model, dataset):
@@ -42,6 +42,6 @@ def test(model, dataset):
     :returns: accuracy of the test set
     """
 
-    batched = dataset.batch(10)
+    batched = dataset.batch(100)
 
     return model.evaluate(batched)
