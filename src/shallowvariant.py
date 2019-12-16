@@ -1,71 +1,80 @@
-from .model import Model, train, test
+from . import model as m
 import argparse
-from preprocess import get_data
+from .preprocess import get_data_train, get_data_eval
 import tensorflow as tf
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--train", action="store_true")
-parser.add_argument("--cnnsize", "-c", default=100)
-parser.add_argument("--learningrate", "-l", default=0.01)
-parser.add_argument("--trainpath", "-t", nargs="?")
-parser.add_argument("--testpath", "-v")
-parser.add_argument("--save", "-s", action="store_true")
-parser.add_argument("--savepath", "-p")
-parser.add_argument("--loadpath", "-m")
+parser.add_argument("--cnnsize", "-c", default=100, type=int)
+parser.add_argument("--learningrate", "-r", default=0.01, type=float)
+parser.add_argument("--inputpath", "-i", required=True)
+parser.add_argument("--probspath", "-p", nargs="?")
+parser.add_argument("--labelpath", "-l", nargs="?")
+parser.add_argument("--savepath", "-s", nargs="?")
+parser.add_argument("--loadpath", "-m", nargs="?")
 
 
 def run(
     train=False,
     cnn_size=100,
     learning_rate=0.01,
-    train_path="",
-    test_path="",
+    input_path="",
+    probs_path="",
+    label_path="",
     save=False,
     save_path="",
     load_path="",
 ):
 
     if train:
-        train_data = get_data(train_path)
+        dataset = get_data_train(input_path, probs_path)
+        dataset = dataset.take(846700)
+        # split_n = size // 10
+        # test_dataset = dataset.take(split_n)
+        # train_dataset = dataset.skip(split_n)
 
-    test_data = get_data(test_path)
+    else:
+        dataset = get_data_eval(input_path, label_path)
+        dataset = dataset.take(100000)
+
+    # import code
+    # code.interact(local=dict(globals(), **locals()))
 
     # Set-up the training step
     if train:
         # initialize model and tensorflow variables
-        model = Model(cnn_size=cnn_size, learning_rate=learning_rate)
-        train(model, train_inputs, train_labels)
+        model = m.make_model(cnn_size=cnn_size, learning_rate=learning_rate)
+        m.train(model, dataset)
 
         if save:
-            tf.saved_model.save(model, save_path)
+            model.save(save_path)
     else:
-        model = tf.saved_model.load(load_path)
+        model = tf.keras.models.load_model(load_path)
 
     # Set up the testing steps
-    loss, accuracy = test(model, test_inputs, test_labels)
+    if not train:
+        loss, accuracy, precision, recall = m.test(model, dataset)
 
-    # Print out perplexity
-    print("Test Accuracy:", accuracy)
+        # Print out results
+        print("Test Accuracy:", accuracy)
+        print("Test Precision:", precision)
+        print("Test Recall:", recall)
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    if args.train:
-        assert args.trainpath != ""
-
-        if args.save:
-            assert args.savepath != ""
-    else:
-        assert args.loadpath != ""
+    if args.savepath != "":
+        save = True
 
     run(
         train=args.train,
         cnn_size=args.cnnsize,
         learning_rate=args.learningrate,
-        train_path=args.trainpath,
-        test_path=args.testpath,
-        save=args.save,
+        input_path=args.inputpath,
+        probs_path=args.probspath,
+        label_path=args.labelpath,
+        save=save,
         save_path=args.savepath,
         load_path=args.loadpath,
     )
