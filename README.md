@@ -38,6 +38,11 @@ We also have an initial implementation for the child model, which is a CNN layer
  * August got the true labels for our test dataset by running DeepVariant in `train` mode, which means turning on the flags `true_vcf` and `confident_regions` with [data from their quickstart](https://github.com/google/deepvariant/blob/r0.9/docs/deepvariant-quick-start.md).
  * August is going to work on getting out the true labels, of which there should be 82. Mary is going to continue working on the model.
 
+## 12/6/19
+
+ * We moved onto running the model on a large training data set. The data was generated using DeepVariant's `make_examples` and then extracted.
+ * Although the data comes from GenieInABottle, in practice we just accessed the data already present in the deepvariant bucket on GCP, which can be accessed with `gsutil ls gs://deepvariant`. We made use of the data from the Training Case Study, the [Case Study](https://github.com/google/deepvariant/blob/r0.9/docs/deepvariant-case-study.md).
+
 # Next steps
 
  * Continue working on `get_data()` based off of the `TFRecord` files. We will have to split this data ourselves, but the ingestion of the files should be straightforward based off of DeepVariant.

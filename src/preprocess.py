@@ -15,14 +15,13 @@ input_spec = {
 
 label_spec = {
         'label': tf.io.FixedLenFeature((), tf.int64),
-        'variant': tf.io.FixedLenFeature((), tf.string),
-        'probabilities': tf.io.FixedLenFeature((), tf.string),
+        #'variant': tf.io.FixedLenFeature((), tf.string),
+        #'probabilities': tf.io.FixedLenFeature((), tf.string),
     }
 
 def _parse_inputs_function(example_proto):
     # Parse the input tf.Example proto using the dictionary above.
     parsed = tf.io.parse_single_example(example_proto, input_spec)
-    print(parsed.values())
     image = parsed['image/encoded']
     # If the input is empty there won't be a tensor_shape.
     image = tf.reshape(tf.io.decode_raw(image, tf.uint8), [100, 221, 6])
@@ -32,12 +31,11 @@ def _parse_inputs_function(example_proto):
 def _parse_labels_function(example_proto):
     # Parse the input tf.Example proto using the dictionary above
     parsed = tf.io.parse_single_example(example_proto, label_spec)
-    print(parsed.values())
-    label = parsed['label']
-    label = tf.io.decode_raw(label, tf.string)
-#    label = tf.dtypes.cast(label, tf.int32)
-    print("label: ", label)
-    return label
+    labels = parsed['label']
+    parsed_labels = []
+    for l in labels:
+        parsed_labels.append(l.numpy())
+    return parsed_labels
 
 def get_data(input_path, label_path):
     input_files = [os.path.join(input_path, x) for x in os.listdir(input_path)]
@@ -46,9 +44,7 @@ def get_data(input_path, label_path):
     labels = tf.data.TFRecordDataset(label_files, compression_type="GZIP")
     parsed_inputs = inputs.map(_parse_inputs_function)
     parsed_labels = labels.map(_parse_labels_function)
-
     return parsed_inputs, parsed_labels
-
 
 # Example of getting data and using it
 # https://github.com/google/deepvariant/blob/r0.9/docs/visualizing_examples.ipynb
