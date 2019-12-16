@@ -51,6 +51,10 @@ Example for testing:
 python -m src.shallowvariant -i data/real_labels -l data/real_labels -m data/my_model.h5
 ```
 
+# Regenerating training data and testing labels
+
+To regenerate the training data and labels, after spinning up a GCP instance (can be any number of cores), copy and paste everything in `scripts/trainingdata.sh`. This will run `make_examples` in training mode, which means generating pileup images and labels. Once that is finished running, copy and paste everything in `scripts/trainingdata_callvariants.sh`. This will run `call_variants`, which outputs probabilities from the pileup images.
+
 # Progress
 
 ## 11/15/19
