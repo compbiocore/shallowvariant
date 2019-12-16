@@ -71,7 +71,13 @@ We also have an initial implementation for the child model, which is a CNN layer
  * The `TFRecord` examples which are the output of `make_examples` are just `TFExamples` which is a `ProtoBuf` with an undocumented dictionary on top. The dictionary lives in the `DeepVariant` code.
  * The `DeepVariant` version we are going to stick to is .7.2, as there are significant changes in current versions that also change the `TFRecord` objects. This may prove a problem for maintainability as if we wanted to use more current versions we would have to invest re-engineering work.
  * Right now, `preprocess` reads files for input, parses images, gets the images into the right shape, and outputs those as inputs for the model. Still need to work on labels. Also need to figure out split and shuffling.
+ * August got the true labels for our test dataset by running DeepVariant in `train` mode, which means turning on the flags `true_vcf` and `confident_regions` with [data from their quickstart](https://github.com/google/deepvariant/blob/r0.9/docs/deepvariant-quick-start.md).
  * August is going to work on getting out the true labels, of which there should be 82. Mary is going to continue working on the model.
+
+## 12/6/19
+
+ * We moved onto running the model on a large training data set. The data was generated using DeepVariant's `make_examples` and then extracted.
+ * Although the data comes from GenieInABottle, in practice we just accessed the data already present in the deepvariant bucket on GCP, which can be accessed with `gsutil ls gs://deepvariant`. We made use of the data from the Training Case Study, the [Case Study](https://github.com/google/deepvariant/blob/r0.9/docs/deepvariant-case-study.md).
 
 # Next steps
 
@@ -79,3 +85,4 @@ We also have an initial implementation for the child model, which is a CNN layer
  * Implement getting the labels from the `TFRecord` files. This could possibly be in `get_data()`, or in a different function.
  * Run the child model to make sure it doesn't crash.
  * If we get the model working (and credits), run DeepVariant on GCP on a larger dataset to get initial input. This will take a couple hours, so we will want to monitor the run and shut off the instance after.
+ * Our larger dataset will come from [gold standard data from GIAB](ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.2/GRCh37/). We can match true labels to data based on DeepVariant's documentation about how [they trained their model](https://github.com/google/deepvariant/blob/r0.9/docs/deepvariant-details-training-data.md).
